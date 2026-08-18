@@ -1,5 +1,5 @@
 import Link from "next/link";
-import prisma from "@/lib/db";
+import { prisma } from "@/lib/db";
 import NewFolderForm from "./NewFolderForm";
 import UploadForm from "./UploadForm";
 

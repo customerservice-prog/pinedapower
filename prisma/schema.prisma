@@ -1,0 +1,87 @@
+// Prisma schema for "My Digital Life" - Phase 1 data foundation.
+// Deliberately minimal: a single unified Item/Asset model instead of
+// per-category tables (no CarPhoto, HousePhoto, VacationPhoto, etc).
+// This will grow in later phases (Things, Albums, Spaces, Timeline).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Single-user application: exactly one User row is expected to exist.
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Folder {
+  id        String    @id @default(uuid())
+  name      String
+  parentId  String?
+  parent    Folder?   @relation("FolderToFolder", fields: [parentId], references: [id])
+  children  Folder[]  @relation("FolderToFolder")
+  items     Item[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum ItemType {
+  PHOTO
+  DOCUMENT
+  VIDEO
+  NOTE
+  OTHER
+}
+
+model Item {
+  id         String     @id @default(uuid())
+  title      String
+  type       ItemType
+  folderId   String?
+  folder     Folder?    @relation(fields: [folderId], references: [id])
+  favorite   Boolean    @default(false)
+  archivedAt DateTime?
+  deletedAt  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  assets     Asset[]
+  tags       Tag[]      @relation("ItemToTag")
+}
+
+enum AssetStatus {
+  PENDING
+  UPLOADING
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
+// Asset = a real file (the sacred original, or a derivative such as a
+// thumbnail). Originals are never overwritten; derivatives are separate rows.
+model Asset {
+  id             String      @id @default(uuid())
+  itemId         String
+  item           Item        @relation(fields: [itemId], references: [id])
+  storageKey     String      @unique
+  originalName   String
+  mimeType       String
+  sizeBytes      Int
+  checksumSha256 String
+  isOriginal     Boolean     @default(true)
+  status         AssetStatus @default(PENDING)
+  createdAt      DateTime    @default(now())
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  items Item[] @relation("ItemToTag")
+}

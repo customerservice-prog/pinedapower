@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { createDownloadUrl } from "@/lib/storage";
 
 // Redirects to a short-lived signed URL for an item's generated thumbnail,

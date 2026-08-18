@@ -17,7 +17,8 @@
     "bcryptjs": "2.4.3",
     "@aws-sdk/client-s3": "3.637.0",
     "@aws-sdk/s3-request-presigner": "3.637.0",
-    "zod": "3.23.8"
+    "zod": "3.23.8",
+    "sharp": "0.33.5"
   },
   "devDependencies": {
     "typescript": "5.5.4",

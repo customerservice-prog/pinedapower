@@ -127,4 +127,3 @@ export default async function VaultPage({
         </main>
       );
 }
-</Link>

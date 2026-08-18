@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import prisma from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { headObject } from "@/lib/storage";
 import { generateThumbnail } from "@/lib/thumbnails";
 

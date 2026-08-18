@@ -28,4 +28,3 @@ export default function FileIcon({ kind, size = 48 }: { kind: FileKind; size?: n
           </div>
         );
 }
-</div>

@@ -9,7 +9,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 /**
  * Low-level private object storage client.
- *
  * This wraps an S3-compatible bucket (provisioned as a Railway "Bucket"
  * service) behind a small set of primitives: presigned upload URLs,
  * presigned download URLs, delete, and existence/metadata checks.
@@ -27,9 +26,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 function requiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
-    throw new Error(
-      `Missing required environment variable: ${name}. Object storage is not configured.`
-    );
+    throw new Error(`Missing required environment variable: ${name}. Object storage is not configured.`);
   }
   return value;
 }
@@ -38,7 +35,6 @@ let cachedClient: S3Client | null = null;
 
 function getClient(): S3Client {
   if (cachedClient) return cachedClient;
-
   cachedClient = new S3Client({
     endpoint: requiredEnv("STORAGE_ENDPOINT"),
     region: process.env.STORAGE_REGION || "auto",
@@ -50,7 +46,6 @@ function getClient(): S3Client {
     // path-style addressing rather than virtual-hosted-style.
     forcePathStyle: true,
   });
-
   return cachedClient;
 }
 
@@ -84,17 +79,17 @@ export async function createUploadUrl(
  */
 export async function createDownloadUrl(
   key: string,
-  options: { expiresInSeconds?: number; downloadFilename?: string } = {}
+  options?: { expiresInSeconds?: number; downloadFilename?: string }
 ): Promise<string> {
   const command = new GetObjectCommand({
     Bucket: getBucket(),
     Key: key,
-    ResponseContentDisposition: options.downloadFilename
+    ResponseContentDisposition: options?.downloadFilename
       ? `attachment; filename="${options.downloadFilename.replace(/"/g, "")}"`
       : undefined,
   });
   return getSignedUrl(getClient(), command, {
-    expiresIn: options.expiresInSeconds ?? DEFAULT_EXPIRES_SECONDS,
+    expiresIn: options?.expiresInSeconds ?? DEFAULT_EXPIRES_SECONDS,
   });
 }
 
@@ -116,7 +111,7 @@ export async function deleteObject(key: string): Promise<void> {
  */
 export async function headObject(
   key: string
-): Promise<{ sizeBytes: number; etag: string | undefined } | null> {
+): Promise<{ sizeBytes: number; etag?: string } | null> {
   try {
     const result = await getClient().send(
       new HeadObjectCommand({ Bucket: getBucket(), Key: key })
@@ -124,7 +119,45 @@ export async function headObject(
     return { sizeBytes: result.ContentLength ?? 0, etag: result.ETag };
   } catch (err: unknown) {
     const maybeCode = (err as { name?: string })?.name;
-    if (maybeCode === "NotFound") return null;
+    if (maybeCode === "NotFound") {
+      return null;
+    }
     throw err;
   }
+}
+
+/**
+ * Fetch an object's full contents into memory. Only used server-side for
+ * small-to-medium derivative generation (e.g. thumbnailing a photo just
+ * uploaded) — never for streaming large originals through the app server.
+ */
+export async function getObjectBuffer(key: string): Promise<Buffer> {
+  const result = await getClient().send(
+    new GetObjectCommand({ Bucket: getBucket(), Key: key })
+  );
+  const stream = result.Body as unknown as AsyncIterable<Uint8Array>;
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+/**
+ * Upload a small server-generated derivative (e.g. a thumbnail) directly,
+ * bypassing the presigned-URL browser flow used for user-supplied originals.
+ */
+export async function putObjectBuffer(
+  key: string,
+  body: Buffer,
+  contentType: string
+): Promise<void> {
+  await getClient().send(
+    new PutObjectCommand({
+      Bucket: getBucket(),
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    })
+  );
 }

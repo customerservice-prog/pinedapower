@@ -1,3 +1,4 @@
+// Vault page: renders folders and files with real file-type icons.
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import NewFolderForm from "./NewFolderForm";

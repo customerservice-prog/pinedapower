@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import { prisma } from "@/lib/db";
 import AppShell from "./components/AppShell";
 import EmptyState from "./components/EmptyState";
 import UploadForm from "./vault/UploadForm";

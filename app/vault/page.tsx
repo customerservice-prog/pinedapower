@@ -19,8 +19,8 @@ const COLORS = {
     accent: "#5b5bf0",
 };
 
-function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + " B";
+function formatBytes(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
     const units = ["KB", "MB", "GB", "TB"];
     let value = bytes / 1024;
     let unitIndex = 0;
@@ -28,7 +28,7 @@ function formatBytes(bytes) {
         value /= 1024;
         unitIndex++;
     }
-    return value.toFixed(1) + " " + units[unitIndex];
+    return `${value.toFixed(1)} ${units[unitIndex]}`;
 }
 
 export default async function VaultPage({
@@ -37,7 +37,7 @@ export default async function VaultPage({
     searchParams?: { folder?: string };
 }) {
     const folderId =
-        searchParams && searchParams.folder && searchParams.folder.length > 0
+        searchParams?.folder && searchParams.folder.length > 0
             ? searchParams.folder
             : null;
 
@@ -78,7 +78,7 @@ export default async function VaultPage({
             </div>
             <div style={{ color: COLORS.textSecondary, marginTop: 6, fontSize: 14 }}>
                 <Link href="/vault" style={{ color: COLORS.accent, textDecoration: "none" }}>Root</Link>
-                {currentFolder ? " / " + currentFolder.name : null}
+                {currentFolder ? ` / ${currentFolder.name}` : null}
             </div>
 
             <NewFolderForm parentId={folderId} />
@@ -89,11 +89,11 @@ export default async function VaultPage({
                     <p style={{ color: COLORS.textSecondary, fontSize: 14 }}>No folders yet.</p>
                 ) : (
                     <ul style={{ listStyle: "none", padding: 0, display: "flex", flexWrap: "wrap", gap: 8, margin: 0 }}>
-                        {subfolders.map((folder) => (
+                        {subfolders.map((folder: any) => (
                             <li key={folder.id}>
                                 <Link
-                                    href={"/vault?folder=" + folder.id}
-                                    style={{ display: "inline-block", padding: "8px 14px", border: "1px solid " + COLORS.border, borderRadius: 8, textDecoration: "none", color: COLORS.textPrimary, background: COLORS.surface, fontSize: 14 }}
+                                    href={`/vault?folder=${folder.id}`}
+                                    style={{ display: "inline-block", padding: "8px 14px", border: `1px solid ${COLORS.border}`, borderRadius: 8, textDecoration: "none", color: COLORS.textPrimary, background: COLORS.surface, fontSize: 14 }}
                                 >
                                     {folder.name}
                                 </Link>
@@ -110,18 +110,23 @@ export default async function VaultPage({
                     <p style={{ color: COLORS.textSecondary, fontSize: 14 }}>No files in this folder yet.</p>
                 ) : (
                     <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                        {items.map((item) => {
-                            const asset = item.assets.find((a) => a.isOriginal) || item.assets[0];
-                            const thumbnail = item.assets.find((a) => !a.isOriginal && a.status === "READY");
-                            const kind = getFileKind(asset && asset.mimeType, asset && asset.originalName);
+                        {items.map((item: any) => {
+                            const asset = item.assets.find((a: any) => a.isOriginal) ?? item.assets[0];
+                            const thumbnail = item.assets.find(
+                                (a: any) => !a.isOriginal && a.status === "READY"
+                            );
+                            const kind = getFileKind(asset?.mimeType, asset?.originalName);
                             return (
-                                <li key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid " + COLORS.border }}>
+                                <li
+                                    key={item.id}
+                                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${COLORS.border}` }}
+                                >
                                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                                         {thumbnail ? (
                                             <img
-                                                src={"/api/items/" + item.id + "/thumbnail"}
+                                                src={`/api/items/${item.id}/thumbnail`}
                                                 alt=""
-                                                style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 6, border: "1px solid " + COLORS.border }}
+                                                style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 6, border: `1px solid ${COLORS.border}` }}
                                             />
                                         ) : (
                                             <FileIcon kind={kind} />
@@ -129,12 +134,14 @@ export default async function VaultPage({
                                         <div>
                                             <div style={{ fontSize: 14 }}>{item.title}</div>
                                             <div style={{ fontSize: 12, color: COLORS.textSecondary }}>
-                                                {asset ? FILE_KIND_LABELS[kind] + " \u00b7 " + formatBytes(asset.sizeBytes) + " \u00b7 " + asset.status : "no file"}
+                                                {asset
+                                                    ? `${FILE_KIND_LABELS[kind]} \u00b7 ${formatBytes(asset.sizeBytes)} \u00b7 ${asset.status}`
+                                                    : "no file"}
                                             </div>
                                         </div>
                                     </div>
                                     {asset && asset.status === "READY" ? (
-                                        <a href={"/api/assets/" + asset.id + "/download"} style={{ fontSize: 14, color: COLORS.accent, textDecoration: "none" }}>Download</a>
+                                        <a href={`/api/assets/${asset.id}/download`} style={{ fontSize: 14, color: COLORS.accent, textDecoration: "none" }}>Download</a>
                                     ) : null}
                                 </li>
                             );

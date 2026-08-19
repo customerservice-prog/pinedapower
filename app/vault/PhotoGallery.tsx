@@ -77,7 +77,7 @@ export default function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
                 position: "absolute",
                 top: 4,
                 right: 4,
-                background: "rgba(11,11,15,0.55)",
+                background: "rgba(255,255,255,0.75)",
                 borderRadius: RADIUS.sm,
               }}
             >
@@ -95,7 +95,7 @@ export default function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(6,6,9,0.96)",
+            background: "rgba(247,247,251,0.97)",
             zIndex: 1000,
             display: "flex",
             alignItems: "center",
@@ -179,7 +179,7 @@ export default function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
               maxHeight: "82vh",
               objectFit: "contain",
               borderRadius: RADIUS.md,
-              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+              boxShadow: "0 20px 60px rgba(20,20,40,0.18)",
             }}
           />
 

@@ -1,3 +1,5 @@
+import { COLORS, RADIUS, SHADOW } from "../components/theme";
+
 type LoginPageProps = {
   searchParams: { from?: string; error?: string };
 };
@@ -13,8 +15,8 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0b0b0f",
-        color: "#f5f5f7",
+        background: COLORS.background,
+        color: COLORS.textPrimary,
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         padding: 16,
@@ -26,16 +28,16 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         style={{
           width: 340,
           padding: 32,
-          borderRadius: 16,
-          background: "#16161d",
-          border: "1px solid #26262f",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+          borderRadius: RADIUS.lg,
+          background: COLORS.surface,
+          border: `1px solid ${COLORS.border}`,
+          boxShadow: SHADOW.panel,
         }}
       >
         <h1 style={{ fontSize: 20, marginBottom: 4, fontWeight: 600 }}>
           My Digital Life
         </h1>
-        <p style={{ fontSize: 13, color: "#9a9aa5", marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: COLORS.textSecondary, marginBottom: 24 }}>
           Private vault. Sign in to continue.
         </p>
 
@@ -57,9 +59,9 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             width: "100%",
             padding: "10px 12px",
             borderRadius: 8,
-            border: "1px solid #2c2c36",
-            background: "#0f0f14",
-            color: "#f5f5f7",
+            border: `1px solid ${COLORS.border}`,
+            background: COLORS.inputBackground,
+            color: COLORS.textPrimary,
             marginBottom: 16,
             fontSize: 14,
             boxSizing: "border-box",
@@ -67,7 +69,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         />
 
         {hasError && (
-          <p style={{ color: "#ff6b6b", fontSize: 13, marginBottom: 12 }}>
+          <p style={{ color: COLORS.danger, fontSize: 13, marginBottom: 12 }}>
             Incorrect password. Please try again.
           </p>
         )}
@@ -79,7 +81,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             padding: "10px 12px",
             borderRadius: 8,
             border: "none",
-            background: "#5b5bf0",
+            background: COLORS.accent,
             color: "white",
             fontWeight: 600,
             fontSize: 14,

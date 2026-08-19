@@ -1,7 +1,7 @@
 // Library page: renders folders and files with real file-type icons,
 // wrapped in the shared application shell.
 import Link from "next/link";
-import prisma from "@/lib/db";
+import { prisma } from "@/lib/db";
 import NewFolderForm from "./NewFolderForm";
 import UploadForm from "./UploadForm";
 import FileIcon from "./FileIcon";

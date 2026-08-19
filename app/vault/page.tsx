@@ -7,6 +7,7 @@ import NewFolderForm from "./NewFolderForm";
 import UploadForm from "./UploadForm";
 import FileIcon from "./FileIcon";
 import FavoriteButton from "./FavoriteButton";
+import DeleteButton from "./DeleteButton";
 import PhotoGallery from "./PhotoGallery";
 import { getFileKind, FILE_KIND_LABELS } from "@/lib/fileKind";
 import { formatBytes } from "@/lib/format";
@@ -341,71 +342,85 @@ function ItemList({ items }: { items: any[] }) {
       )}
 
       {otherItems.length > 0 && (
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {otherItems.map((item: any) => {
-            const asset = item.assets.find((a: any) => a.isOriginal);
-            const thumbnail = item.assets.find((a: any) => a.isOriginal && a.status === "READY");
-            const kind = getFileKind(asset?.mimeType, asset?.originalName);
-            return (
-              <li
-                key={item.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "12px 14px",
-                  borderRadius: RADIUS.md,
-                  border: `1px solid ${COLORS.border}`,
-                  background: COLORS.surface,
-                  marginBottom: 8,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {thumbnail ? (
-                    <img
-                      src={`/api/items/${item.id}/thumbnail`}
-                      alt=""
-                      style={{
-                        width: 40,
-                        height: 40,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        border: `1px solid ${COLORS.border}`,
-                      }}
-                    />
-                  ) : (
-                    <FileIcon kind={kind} />
-                  )}
-                  <div>
-                    <div style={{ fontSize: 14 }}>{item.title}</div>
-                    <div style={{ fontSize: 12, color: COLORS.textSecondary }}>
-                      {asset
-                        ? `${FILE_KIND_LABELS[kind]} · ${formatBytes(asset.sizeBytes)} · ${asset.status}`
-                        : "no file"}
+        <>
+          <style>{`
+            .item-row {
+              transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+            }
+            .item-row:hover {
+              box-shadow: 0 8px 20px rgba(20,20,40,0.08);
+              border-color: ${COLORS.accent};
+              transform: translateY(-1px);
+            }
+          `}</style>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {otherItems.map((item: any) => {
+              const asset = item.assets.find((a: any) => a.isOriginal);
+              const thumbnail = item.assets.find((a: any) => a.isOriginal && a.status === "READY");
+              const kind = getFileKind(asset?.mimeType, asset?.originalName);
+              return (
+                <li
+                  key={item.id}
+                  className="item-row"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "12px 14px",
+                    borderRadius: RADIUS.md,
+                    border: `1px solid ${COLORS.border}`,
+                    background: COLORS.surface,
+                    marginBottom: 8,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    {thumbnail ? (
+                      <img
+                        src={`/api/items/${item.id}/thumbnail`}
+                        alt=""
+                        style={{
+                          width: 40,
+                          height: 40,
+                          objectFit: "cover",
+                          borderRadius: 8,
+                          border: `1px solid ${COLORS.border}`,
+                        }}
+                      />
+                    ) : (
+                      <FileIcon kind={kind} />
+                    )}
+                    <div>
+                      <div style={{ fontSize: 14 }}>{item.title}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textSecondary }}>
+                        {asset
+                          ? `${FILE_KIND_LABELS[kind]} · ${formatBytes(asset.sizeBytes)} · ${asset.status}`
+                          : "no file"}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <FavoriteButton itemId={item.id} initialFavorite={!!item.favorite} />
-                  {asset && asset.status === "READY" && (
-                    <a
-                      href={`/api/assets/${asset.id}/download`}
-                      style={{
-                        fontSize: 13,
-                        color: COLORS.accent,
-                        textDecoration: "none",
-                        fontWeight: 600,
-                        marginLeft: 8,
-                      }}
-                    >
-                      Download
-                    </a>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <FavoriteButton itemId={item.id} initialFavorite={!!item.favorite} />
+                    <DeleteButton itemId={item.id} itemTitle={item.title} />
+                    {asset && asset.status === "READY" && (
+                      <a
+                        href={`/api/assets/${asset.id}/download`}
+                        style={{
+                          fontSize: 13,
+                          color: COLORS.accent,
+                          textDecoration: "none",
+                          fontWeight: 600,
+                          marginLeft: 8,
+                        }}
+                      >
+                        Download
+                      </a>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
     </>
   );

@@ -18,7 +18,7 @@ const COLORS = {
 // the private bucket via a presigned URL; they never pass through our
 // Next.js server. A client-computed SHA-256 travels with the request so
 // later phases can use it for duplicate detection.
-async function sha256Hex(file) {
+async function sha256Hex(file: File): Promise<string> {
     const buf = await file.arrayBuffer();
     const hashBuf = await crypto.subtle.digest("SHA-256", buf);
     return Array.from(new Uint8Array(hashBuf))
@@ -26,19 +26,19 @@ async function sha256Hex(file) {
         .join("");
 }
 
-function inferType(mime) {
+function inferType(mime: string): "PHOTO" | "DOCUMENT" | "VIDEO" | "OTHER" {
     if (mime.startsWith("image/")) return "PHOTO";
     if (mime.startsWith("video/")) return "VIDEO";
     if (mime === "application/pdf" || mime.startsWith("text/")) return "DOCUMENT";
     return "OTHER";
 }
 
-export default function UploadForm({ folderId }) {
-    const [status, setStatus] = useState(null);
-    const [error, setError] = useState(null);
+export default function UploadForm({ folderId }: { folderId: string | null }) {
+    const [status, setStatus] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    async function handleFile(e) {
+    async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files && e.target.files[0];
         e.target.value = "";
         if (!file) return;

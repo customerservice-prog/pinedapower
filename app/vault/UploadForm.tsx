@@ -105,9 +105,9 @@ export default function UploadForm({
   }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
-    e.target.value = "";
-    if (!files || files.length === 0) return;
+    const files = e.target.files ? Array.from(e.target.files) : [];
+        e.target.value = "";
+        if (files.length === 0) return;
     await uploadFiles(files);
   }
 

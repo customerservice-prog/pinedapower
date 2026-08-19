@@ -13,13 +13,13 @@ const COLORS = {
     danger: "#ff6b6b",
 };
 
-export default function NewFolderForm({ parentId }) {
+export default function NewFolderForm({ parentId }: { parentId: string | null }) {
     const [name, setName] = useState("");
     const [busy, setBusy] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!name.trim()) return;
         setBusy(true);

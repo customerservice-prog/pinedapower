@@ -1,16 +1,16 @@
 export const COLORS = {
-  background: "#0b0b0f",
-  surface: "#16161d",
-  surfaceHover: "#1c1c24",
-  border: "#26262f",
-  inputBackground: "#0f0f14",
-  textPrimary: "#f5f5f7",
-  textSecondary: "#8a8a93",
-  textTertiary: "#5f5f68",
+  background: "#f7f7fb",
+  surface: "#ffffff",
+  surfaceHover: "#eeeef5",
+  border: "#e2e2ec",
+  inputBackground: "#ffffff",
+  textPrimary: "#17171f",
+  textSecondary: "#66666f",
+  textTertiary: "#96969f",
   accent: "#5b5bf0",
-  accentHover: "#6f6ff5",
-  danger: "#ff6b6b",
-  success: "#4cd97b",
+  accentHover: "#4a4ae0",
+  danger: "#d92d43",
+  success: "#1f9d55",
 };
 
 export const RADIUS = {
@@ -21,6 +21,6 @@ export const RADIUS = {
 };
 
 export const SHADOW = {
-  panel: "0 20px 60px rgba(0,0,0,0.5)",
-  menu: "0 16px 40px rgba(0,0,0,0.45)",
+  panel: "0 20px 60px rgba(20,20,40,0.12)",
+  menu: "0 16px 40px rgba(20,20,40,0.10)",
 };

@@ -1,46 +1,100 @@
-export default function Home() {
+import prisma from "@/lib/db";
+import AppShell from "./components/AppShell";
+import EmptyState from "./components/EmptyState";
+import UploadForm from "./vault/UploadForm";
+import NewFolderForm from "./vault/NewFolderForm";
+import { COLORS, RADIUS } from "./components/theme";
+
+// Always read fresh from the database - this is a private vault for one
+// user, not a page we ever want cached or statically generated.
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const itemCount = await prisma.item.count({ where: { deletedAt: null } });
+
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "4rem 2rem", maxWidth: 640, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h1>My Digital Life</h1>
-        <form method="POST" action="/api/auth/logout">
-          <button
-            type="submit"
-            style={{
-              background: "none",
-              border: "1px solid #ccc",
-              borderRadius: 6,
-              padding: "6px 12px",
-              cursor: "pointer",
-              fontSize: 14,
-            }}
-          >
-            Sign out
-          </button>
-        </form>
+    <AppShell active="home" currentFolderId={null}>
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "56px 32px 64px" }}>
+        <div style={{ fontSize: 34, fontWeight: 700, marginBottom: 8 }}>Good morning.</div>
+        <div style={{ fontSize: 16, color: COLORS.textSecondary, marginBottom: 40 }}>
+          {itemCount > 0
+            ? "Everything that matters, in one place."
+            : "Your digital life starts here."}
+        </div>
+
+        {itemCount === 0 && (
+          <>
+            <EmptyState
+              title="Preserve the photos, documents and records you never want to lose."
+              description="Start by adding something from your life below. Everything stays private, and originals are never altered."
+            />
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: 16,
+                marginTop: 8,
+              }}
+            >
+              <QuickActionCard
+                title="Upload Photos"
+                description="Preserve your memories and browse them beautifully."
+              >
+                <UploadForm folderId={null} label="Upload Photos" accept="image/*" />
+              </QuickActionCard>
+              <QuickActionCard
+                title="Add Documents"
+                description="Keep important paperwork searchable and printable."
+              >
+                <UploadForm folderId={null} label="Upload File" />
+              </QuickActionCard>
+              <QuickActionCard
+                title="Create a Folder"
+                description="Organize personal, family or business records."
+              >
+                <NewFolderForm parentId={null} />
+              </QuickActionCard>
+            </div>
+          </>
+        )}
+
+        {itemCount > 0 && (
+          <EmptyState
+            title="Your library is growing."
+            description={`You have ${itemCount} item${itemCount === 1 ? "" : "s"} preserved so far. Open your Library to browse, organize and add more.`}
+          />
+        )}
       </div>
-      <p>Everything that matters, in one place.</p>
-      <p>
-        This is a private vault under active construction. Single-user authentication, a
-        PostgreSQL-backed data layer (folders, items, assets, tags), and private object
-        storage with a working upload/download pipeline are live. The photo and document
-        processing engines (thumbnails, previews, OCR) have not been built yet.
-      </p>
-      <a
-        href="/vault"
-        style={{
-          display: "inline-block",
-          marginTop: 12,
-          padding: "8px 16px",
-          border: "1px solid #222",
-          borderRadius: 6,
-          textDecoration: "none",
-          color: "#222",
-          fontSize: 14,
-        }}
-      >
-        Open vault →
-      </a>
-    </main>
+    </AppShell>
+  );
+}
+
+function QuickActionCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: RADIUS.lg,
+        background: COLORS.surface,
+        padding: 20,
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+      }}
+    >
+      <div>
+        <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{title}</div>
+        <div style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 1.5 }}>{description}</div>
+      </div>
+      <div>{children}</div>
+    </div>
   );
 }

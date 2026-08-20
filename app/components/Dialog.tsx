@@ -53,6 +53,8 @@ export default function Dialog({
           padding: 24,
           width: 380,
           maxWidth: "90vw",
+          maxHeight: "90vh",
+          overflowY: "auto",
           boxShadow: SHADOW.panel,
         }}
       >

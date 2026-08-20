@@ -356,7 +356,14 @@ function ItemList({ items }: { items: any[] }) {
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {otherItems.map((item: any) => {
               const asset = item.assets.find((a: any) => a.isOriginal);
-              const thumbnail = item.assets.find((a: any) => a.isOriginal && a.status === "READY");
+              // A real generated thumbnail derivative (isOriginal: false), not
+              // just "the original happens to be ready" - photos get one from
+              // the thumbnail pipeline, but videos/PDFs/other files usually
+              // don't, so they should fall back to the FileIcon badge instead
+              // of a broken <img> pointing at a thumbnail that doesn't exist.
+              const thumbnailAsset = item.assets.find(
+                (a: any) => !a.isOriginal && a.status === "READY"
+              );
               const kind = getFileKind(asset?.mimeType, asset?.originalName);
               return (
                 <li
@@ -374,7 +381,7 @@ function ItemList({ items }: { items: any[] }) {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    {thumbnail ? (
+                    {thumbnailAsset ? (
                       <img
                         src={`/api/items/${item.id}/thumbnail`}
                         alt=""

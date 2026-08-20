@@ -22,14 +22,14 @@ model User {
 }
 
 model Folder {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   parentId  String?
-  parent    Folder?   @relation("FolderToFolder", fields: [parentId], references: [id])
-  children  Folder[]  @relation("FolderToFolder")
+  parent    Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
+  children  Folder[] @relation("FolderToFolder")
   items     Item[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ItemType {
@@ -41,18 +41,18 @@ enum ItemType {
 }
 
 model Item {
-  id         String     @id @default(uuid())
-  title      String
-  type       ItemType
-  folderId   String?
-  folder     Folder?    @relation(fields: [folderId], references: [id])
-  favorite   Boolean    @default(false)
-  archivedAt DateTime?
-  deletedAt  DateTime?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  assets     Asset[]
-  tags       Tag[]      @relation("ItemToTag")
+  id          String     @id @default(uuid())
+  title       String
+  type        ItemType
+  folderId    String?
+  folder      Folder?    @relation(fields: [folderId], references: [id])
+  favorite    Boolean    @default(false)
+  archivedAt  DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  assets      Asset[]
+  tags        Tag[]      @relation("ItemToTag")
 }
 
 enum AssetStatus {
@@ -84,4 +84,37 @@ model Tag {
   id    String @id @default(uuid())
   name  String @unique
   items Item[] @relation("ItemToTag")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+// Family Tree: a simple genealogy graph. Each person can have up to two
+// parents and one spouse (both self-relations) - enough to render a real
+// branching family tree without a generic many-to-many graph model.
+// onDelete: SetNull so removing a person never cascades into deleting
+// relatives - it just leaves that particular branch link blank.
+model FamilyMember {
+  id                String         @id @default(uuid())
+  name              String
+  gender            Gender         @default(UNKNOWN)
+  birthYear         Int?
+  deathYear         Int?
+  notes             String?
+  photoUrl          String?
+  parentId1         String?
+  parentId2         String?
+  parent1           FamilyMember?  @relation("Parent1Children", fields: [parentId1], references: [id], onDelete: SetNull)
+  parent2           FamilyMember?  @relation("Parent2Children", fields: [parentId2], references: [id], onDelete: SetNull)
+  childrenAsParent1 FamilyMember[] @relation("Parent1Children")
+  childrenAsParent2 FamilyMember[] @relation("Parent2Children")
+  spouseId          String?        @unique
+  spouse            FamilyMember?  @relation("Spouse", fields: [spouseId], references: [id], onDelete: SetNull)
+  spouseOf          FamilyMember?  @relation("Spouse")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
